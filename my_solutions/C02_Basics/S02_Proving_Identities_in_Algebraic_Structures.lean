@@ -59,7 +59,7 @@ theorem add_left_cancel {a b c : R} (h : a + b = a + c) : b = c := by
   rw [← neg_add_cancel_left a b, h, neg_add_cancel_left]
 
 theorem add_right_cancel {a b c : R} (h : a + b = c + b) : a = c := by
-  rw [← add_neg_cancel_right a b, h, add_neg_cancel_right ]
+  rw [← add_neg_cancel_right a b, h, add_neg_cancel_right]
 
 theorem mul_zero (a : R) : a * 0 = 0 := by
   have h : a * 0 + a * 0 = a * 0 + 0 := by
@@ -75,14 +75,21 @@ theorem neg_eq_of_add_eq_zero {a b : R} (h : a + b = 0) : -a = b := by
   rw [← neg_add_cancel_left a b, h, add_zero]
 
 theorem eq_neg_of_add_eq_zero {a b : R} (h : a + b = 0) : a = -b := by
-  sorry
+  rw [← neg_add_cancel_left b a, add_comm b a, h, add_zero]
 
 theorem neg_zero : (-0 : R) = 0 := by
   apply neg_eq_of_add_eq_zero
   rw [add_zero]
 
 theorem neg_neg (a : R) : - -a = a := by
-  sorry
+  -- Change to goal to proving `-a + a = 0` which is the hypothesis of
+  -- `neg_eq_of_add_eq_zero` This works because the `neg_neg` theorem fits the
+  -- structure of `neg_eq_of_add_eq_zero`: We can rewrite `- -a = a` as `-a = b`
+  -- if we let `a = -a` and `b = a`.
+  apply neg_eq_of_add_eq_zero
+  -- Proving `-a + a = 0` is easy, because it follows from a group axiom:
+  -- combining an element and its inverse yields the identity element.
+  rw [neg_add_cancel]
 
 end MyRing
 
@@ -105,13 +112,13 @@ namespace MyRing
 variable {R : Type*} [Ring R]
 
 theorem self_sub (a : R) : a - a = 0 := by
-  sorry
+  rw [sub_eq_add_neg, add_neg_cancel]
 
 theorem one_add_one_eq_two : 1 + 1 = (2 : R) := by
   norm_num
 
 theorem two_mul (a : R) : 2 * a = a + a := by
-  sorry
+  rw [← one_add_one_eq_two, right_distrib, one_mul]
 
 end MyRing
 
