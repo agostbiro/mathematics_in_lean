@@ -141,13 +141,22 @@ variable {G : Type*} [Group G]
 namespace MyGroup
 
 theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  have h : (a * a⁻¹)⁻¹ * (a * a⁻¹ * (a * a⁻¹)) = 1 := by
+    rw [mul_assoc, ← mul_assoc a⁻¹ a, inv_mul_cancel, one_mul, inv_mul_cancel]
+  rw [← h, ← mul_assoc, inv_mul_cancel, one_mul]
 
 theorem mul_one (a : G) : a * 1 = a := by
-  sorry
+  rw [← inv_mul_cancel, ← mul_assoc, mul_inv_cancel, one_mul]
 
-theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+theorem mul_inv_rev_mine (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
+  -- If the inverse of (a * b) is (b⁻¹ * a⁻¹), then (a * b) * (b⁻¹ * a⁻¹) = 1
+  have h: (a * b) * (b⁻¹ * a⁻¹) = 1 := by
+    rw [← mul_assoc, mul_assoc a, mul_inv_cancel, mul_assoc, one_mul, mul_inv_cancel]
+  rw [← one_mul (b⁻¹ * a⁻¹), ← inv_mul_cancel (a * b), mul_assoc, h, mul_one]
+
+theorem mul_inv_official (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
+  rw [← one_mul (b⁻¹ * a⁻¹), ← inv_mul_cancel (a * b), mul_assoc, mul_assoc, ← mul_assoc b b⁻¹,
+    mul_inv_cancel, one_mul, mul_inv_cancel, mul_one]
 
 end MyGroup
 
