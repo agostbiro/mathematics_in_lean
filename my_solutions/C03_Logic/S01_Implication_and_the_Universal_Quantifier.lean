@@ -22,28 +22,69 @@ variable (ha : |a| < δ) (hb : |b| < δ)
 end
 
 theorem my_lemma2 : ∀ {x y ε : ℝ}, 0 < ε → ε ≤ 1 → |x| < ε → |y| < ε → |x * y| < ε :=
-  sorry
+  sorry -- sorry means todo
 
 section
 variable (a b δ : ℝ)
 variable (h₀ : 0 < δ) (h₁ : δ ≤ 1)
 variable (ha : |a| < δ) (hb : |b| < δ)
 
+-- my_lemma2 is now |x| < ε → |y| < ε → |x * y| < ε
+#check my_lemma2 h₀ h₁
+-- my_lemma2 is now |x * y| < ε
 #check my_lemma2 h₀ h₁ ha hb
 
 end
 
 theorem my_lemma3 :
     ∀ {x y ε : ℝ}, 0 < ε → ε ≤ 1 → |x| < ε → |y| < ε → |x * y| < ε := by
-  intro x y ε epos ele1 xlt ylt
+  intro
+    x y ε
+    epos -- 0 < ε
+    ele1 -- ε ≤ 1
+    xlt -- |x| < ε
+    ylt -- |y| < ε
   sorry
 
 theorem my_lemma4 :
     ∀ {x y ε : ℝ}, 0 < ε → ε ≤ 1 → |x| < ε → |y| < ε → |x * y| < ε := by
-  intro x y ε epos ele1 xlt ylt
+  intro
+    x y ε
+    epos -- 0 < ε
+    ele1 -- ε ≤ 1
+    xlt -- |x| < ε
+    ylt -- |y| < ε
   calc
-    |x * y| = |x| * |y| := sorry
-    _ ≤ |x| * ε := sorry
+    |x * y| = |x| * |y| := by
+      apply abs_mul
+    |x| * |y| ≤ |x| * ε := by
+      -- Change the goal to proving that preconditions for the `mul_le_mul` theorem hold.
+      -- `theorem mul_le_mul: a ≤ b → c ≤ d → 0 ≤ c → 0 ≤ b → a * c ≤ b * d`
+      apply mul_le_mul;
+      -- Next we have to prove that the four preconditions for `mul_le_mul`
+      -- hold:
+      -- First, prove `|x| <= |x|` with the `linarith` tactic which will negate
+      -- the inequality and tries to find a contraction. `|x| > |x|` is a
+      -- contradiction, so it won't have to do much work.
+      linarith;
+      -- Second, prove `|y| <= ε`. The `linarith` tactic will look at the
+      -- hypothesis from the context to find a contradiction. We have as a
+      -- hypothesis that `|y| < ε`, so by assuming `|y| >= ε`, `linarith` will
+      -- directly find a contradiction.
+      linarith;
+      -- Third, prove `0 <= |y|`. For this, we have to view the real numbers as
+      -- an additive group and a lattice (which provides ordering). The absolute
+      -- value of an element in this context is the greater of itself and its
+      -- inverse, i.e. `|a| = max(a, a⁻¹)`.
+      -- That `0 <= |a|` for some element `a`, can be proven by showing that
+      -- `0 <= |a| + |a|`, and then using a theorem that says `0 <= a + a => 0 <= a`.
+      -- We can prove `0 <= |a| + |a|` by noting that `|a| + |a| = max(|a| + a, |a| + a⁻¹)`
+      -- and `|a| + a = max(a + a, a⁻¹ + a)`. With the `a⁻¹ + a` expression we get a
+      -- `0` in the maxes, so we can rewrite our goal `0 <= |a| + |a|` as
+      -- `0 <= max(..., 0, ...)`.
+      apply abs_nonneg;
+      -- Fourth, prove `0 <= |x|` the same way.
+      apply abs_nonneg;
     _ < 1 * ε := sorry
     _ = ε := sorry
 
