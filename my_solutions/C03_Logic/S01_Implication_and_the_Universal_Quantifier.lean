@@ -85,8 +85,14 @@ theorem my_lemma4 :
       apply abs_nonneg;
       -- Fourth, prove `0 <= |x|` the same way.
       apply abs_nonneg;
-    _ < 1 * ε := sorry
-    _ = ε := sorry
+    |x| * ε < 1 * ε := by
+      -- Cancel ε
+      rw [mul_lt_mul_right epos]
+      -- Conclude by contradiction that |x| < 1 by assuming the negation which
+      -- contradicts the `ele1` and `xlt` hyptothesis.
+      linarith
+    1 * ε = ε := by
+      apply one_mul
 
 def FnUb (f : ℝ → ℝ) (a : ℝ) : Prop :=
   ∀ x, f x ≤ a
