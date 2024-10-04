@@ -105,20 +105,34 @@ variable (f g : ℝ → ℝ) (a b : ℝ)
 
 example (hfa : FnUb f a) (hgb : FnUb g b) : FnUb (fun x ↦ f x + g x) (a + b) := by
   intro x
-  dsimp
+  change f x + g x <= a + b
   apply add_le_add
   apply hfa
   apply hgb
 
-example (hfa : FnLb f a) (hgb : FnLb g b) : FnLb (fun x ↦ f x + g x) (a + b) :=
-  sorry
+example (hfa : FnLb f a) (hgb : FnLb g b) : FnLb (fun x ↦ f x + g x) (a + b) := by
+  intro x
+  change a + b <= f x + g x
+  apply add_le_add
+  apply hfa
+  apply hgb
 
-example (nnf : FnLb f 0) (nng : FnLb g 0) : FnLb (fun x ↦ f x * g x) 0 :=
-  sorry
+example (nnf : FnLb f 0) (nng : FnLb g 0) : FnLb (fun x ↦ f x * g x) 0 := by
+  intro x
+  change 0 <= f x * g x
+  apply mul_nonneg
+  apply nnf
+  apply nng
 
 example (hfa : FnUb f a) (hgb : FnUb g b) (nng : FnLb g 0) (nna : 0 ≤ a) :
-    FnUb (fun x ↦ f x * g x) (a * b) :=
-  sorry
+    FnUb (fun x ↦ f x * g x) (a * b) := by
+    intro x
+    change f x * g x <= a * b
+    apply mul_le_mul
+    apply hfa
+    apply hgb
+    apply nng
+    apply nna
 
 end
 
@@ -150,11 +164,27 @@ example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x := by
 example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x :=
   fun a b aleb ↦ add_le_add (mf aleb) (mg aleb)
 
+example {c : ℝ} (mf : Monotone f) (nnc : 0 ≤ c) : Monotone fun x ↦ c * f x := by
+  intro a b aleb
+  change c * f a <= c * f b
+  apply mul_le_mul_of_nonneg_left
+  apply mf aleb
+  apply nnc
+
 example {c : ℝ} (mf : Monotone f) (nnc : 0 ≤ c) : Monotone fun x ↦ c * f x :=
-  sorry
+  fun a b aleb ↦ mul_le_mul_of_nonneg_left (mf aleb) nnc
+
+example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f (g x) := by
+  intro a b aleb
+  change f (g a) <= f (g b)
+  apply mf
+  apply mg aleb
 
 example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f (g x) :=
-  sorry
+  fun a b aleb ↦ mf (mg aleb)
+
+example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f (g x) :=
+  fun a b aleb ↦ mf (mg aleb)
 
 def FnEven (f : ℝ → ℝ) : Prop :=
   ∀ x, f x = f (-x)
