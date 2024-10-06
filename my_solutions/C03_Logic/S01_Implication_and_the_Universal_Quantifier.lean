@@ -161,6 +161,7 @@ example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x := by
   apply mf aleb
   apply mg aleb
 
+-- More elegant proof term
 example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x :=
   fun a b aleb ↦ add_le_add (mf aleb) (mg aleb)
 
@@ -194,19 +195,23 @@ def FnOdd (f : ℝ → ℝ) : Prop :=
 
 example (ef : FnEven f) (eg : FnEven g) : FnEven fun x ↦ f x + g x := by
   intro x
-  calc
-    (fun x ↦ f x + g x) x = f x + g x := rfl
-    _ = f (-x) + g (-x) := by rw [ef, eg]
-
+  change f x + g x = f (-x) + g (-x)
+  rw [ef, eg]
 
 example (of : FnOdd f) (og : FnOdd g) : FnEven fun x ↦ f x * g x := by
-  sorry
+  intro x
+  change f x * g x = f (-x) * g (-x)
+  rw [of, og, neg_mul_neg]
 
 example (ef : FnEven f) (og : FnOdd g) : FnOdd fun x ↦ f x * g x := by
-  sorry
+  intro x
+  change f x * g x = -(f (-x) * g (-x))
+  rw [ef, og, mul_neg]
 
 example (ef : FnEven f) (og : FnOdd g) : FnEven fun x ↦ f (g x) := by
-  sorry
+  intro x
+  change f (g x) = f (g (-x))
+  rw [ef, og, neg_neg]
 
 end
 
