@@ -223,13 +223,30 @@ example : s ⊆ s := by
   intro x xs
   exact xs
 
+-- ∀ {x : α}, x ∈ s → x ∈ s
 theorem Subset.refl : s ⊆ s := fun x xs ↦ xs
 
+-- a ⊆ b means ∀ {x : α}, x ∈ a → x ∈ b
+-- The theorem thus expands to:
+-- r ⊆ s → s ⊆ t → ∀ {x : α}, x ∈ r → x ∈ t
 theorem Subset.trans : r ⊆ s → s ⊆ t → r ⊆ t := by
-  intro rs st x xr
-  apply st
-  apply rs
-  exact xr
+  intro -- hypotheses
+    r_sub_s -- r ⊆ s: ∀ {x : α}, x ∈ r → x ∈ s
+    s_sub_t -- s ⊆ t: ∀ {x : α}, x ∈ s → x ∈ t
+    x       -- x : α
+    x_member_r -- x ∈ r
+  -- goal is to prove x ⊆ t based on the above hypotheses
+  apply s_sub_t -- prove x ∈ t by proving x ∈ s
+  apply r_sub_s -- prove x ∈ s by proving x ∈ r
+  exact x_member_r -- we have x ∈ r as a hypothesis
+
+-- The same proof can be written as a proof term in a functional style where the
+-- hypotheses are arguments. The goal is again to prove x ⊆ t.
+-- `(r_sub_s x_member_r)` means prove x ∈ s by applying the hypothesis x ∈ r to
+-- the hypothesis r ⊆ s which expands to ∀ {x : α}, x ∈ r → x ∈ s.
+-- `(s_sub_t _)` means prove x ∈ t using s ⊆ t by proving x ∈ s.
+theorem Subset.trans_term : r ⊆ s → s ⊆ t → r ⊆ t :=
+  fun r_sub_s s_sub_t _x x_member_r ↦ s_sub_t (r_sub_s x_member_r)
 
 end
 
