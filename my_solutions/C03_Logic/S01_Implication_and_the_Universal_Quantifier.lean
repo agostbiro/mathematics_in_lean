@@ -257,8 +257,10 @@ variable (s : Set α) (a b : α)
 def SetUb (s : Set α) (a : α) :=
   ∀ x, x ∈ s → x ≤ a
 
-example (h : SetUb s a) (h' : a ≤ b) : SetUb s b :=
-  sorry
+example (h : SetUb s a) (h' : a ≤ b) : SetUb s b := by
+  -- fun x x_member_s ↦ le_trans (h x x_member_s) h'
+  intro x x_member_s
+  apply le_trans (h x x_member_s) h'
 
 end
 
